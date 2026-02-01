@@ -40,6 +40,28 @@ def test_math_workflow_success(mock_llm_response):
     assert "6" in final_message.content
     assert len(events) > 1 # 應該有步驟
 
+    assert len(events) > 1 # 應該有步驟
+
+def test_add_workflow_success(mock_llm_response):
+    """
+    測試代理人是否能夠成功處理加法查詢。
+    """
+    # 模擬 LLM 決定調用工具
+    mock_llm_response.invoke.side_effect = [
+        AIMessage(content="", tool_calls=[{"name": "add", "args": {"a": 10, "b": 20}, "id": "call_add_1"}]),
+        AIMessage(content="The result is 30.")
+    ]
+
+    inputs = {"messages": [HumanMessage(content="What is 10 + 20?")]}
+    config = {"configurable": {"thread_id": "test_add_1"}}
+    
+    # 執行圖表
+    events = list(app.stream(inputs, config=config, stream_mode="values"))
+    
+    # 檢查我們是否得到最終回應
+    final_message = events[-1]["messages"][-1]
+    assert "30" in final_message.content
+
 def test_search_workflow_latency(mock_llm_response):
     """
     基準測試代理人工作流程的延遲。
