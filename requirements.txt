@@ -1,0 +1,7 @@
+langchain
+langgraph
+langchain-community
+duckduckgo-search>=5.0
+pytest
+openai
+langchain-openai
