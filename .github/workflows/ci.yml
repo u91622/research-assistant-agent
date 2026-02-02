@@ -26,9 +26,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
-    - name: Run Unit & Integration Tests
+    - name: Run Unit & Integration Tests (with Coverage)
       run: |
-        pytest tests/test_agent.py tests/test_tools.py
+        pytest --cov=./ --cov-report=xml tests/test_agent.py tests/test_tools.py
+        
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: user/repo
         
     - name: Run Performance Benchmarks
       run: |
