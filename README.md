@@ -1,4 +1,4 @@
-# 研究助理代理人 (Research Assistant Agent)
+# AI研究助理 (Research Assistant Agent)
 
 這是一個使用 LangChain 和 LangGraph 構建的簡單 AI 代理人，作為研究助理使用。它允許執行數學運算並使用 DuckDuckGo 搜尋網路，且具備對話記憶功能。
 
@@ -59,3 +59,4 @@ pytest tests/test_agent.py
 - `agent.py`: 主要代理人邏輯與進入點。
 - `tools.py`: 工具定義。
 - `tests/`: Pytest 測試檔案。
+
