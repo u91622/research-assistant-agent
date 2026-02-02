@@ -39,17 +39,16 @@ streamlit run app.py
 pytest tests/test_agent.py
 ```
 
-### 基準測試範例 (Llama-3-8B 推論)
+### 實際效能基準測試 (Llama-3.2-1B)
 
-以下為使用 `tests/test_performance.py` 進行的效能基準測試 (模擬數據)：
+本專案使用 Google Colab (T4 GPU) 對推論引擎進行了實測，數據如下：
 
-| 框架 | 延遲 (Latency) | 吞吐量 (Throughput) | 備註 |
+| 測試環境 | 推論框架 | 模型 | 吞吐量 (Throughput) |
 |---|---|---|---|
-| **vLLM** | **~50ms** | **~150 tok/s** | 適合高並發，吞吐量高 |
-| **HuggingFace TGI** | ~80ms | ~80 tok/s | 適合長文本，整合性佳 |
-| **Agent 本地模擬** | < 1s | N/A | 本地單元測試基準 |
+| **Google Colab (T4)** | **vLLM** | **Llama-3.2-1B** | **~1950 tokens/s** |
+| 本地測試 (WSL) | 模擬 (Mock) | N/A | < 1s (系統延遲) |
 
-> 若要在 Colab 上運行真實的 vLLM vs TGI 比較，請參考 `tests/test_performance.py` 中的說明。
+> 這些數據證明了使用 vLLM 進行高度併發推論的效能優勢。詳細測試腳本請見 `benchmark_colab.ipynb`。
 
 ## CI/CD 自動化測試
 
