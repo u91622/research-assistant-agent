@@ -10,16 +10,41 @@ from tools import tools # 從我們的 tools.py 匯入工具
 class AgentState(TypedDict):
     messages: list[BaseMessage]
 
+from langchain_core.runnables import RunnableConfig
+import os
+
+
 # 定義代理人
-def agent(state: AgentState):
+def agent(state: AgentState, config: RunnableConfig):
     """
     主要的代理人節點，使用工具調用 LLM。
+    支援透過 config 切換不同模型提供者。
     """
     messages = state['messages']
-    # 我們需要確保有 API 金鑰。
-    # 目前我們假設 OPENAI_API_KEY 在環境變數中，或者使用者會提供。
-    # 我們使用標準模型。
-    model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    
+    # 讀取配置
+    configurable = config.get("configurable", {})
+    provider = configurable.get("provider", "openai")
+    model_name = configurable.get("model_name", "gpt-3.5-turbo")
+    
+    # 根據 provider 初始化模型
+    # 目前僅支援 Cerebras (使用 OpenAI 兼容協議)
+    if provider == "cerebras":
+        model = ChatOpenAI(
+            model=model_name,
+            temperature=0,
+            base_url="https://api.cerebras.ai/v1",
+            api_key=os.environ.get("CEREBRAS_API_KEY")
+        )
+    else:
+        # Fallback to Cerebras just in case or raise error, but for now default to Cerebras Llama
+        model = ChatOpenAI(
+            model="llama-3.3-70b",
+            temperature=0,
+            base_url="https://api.cerebras.ai/v1",
+            api_key=os.environ.get("CEREBRAS_API_KEY")
+        )
+
     model = model.bind_tools(tools)
     response = model.invoke(messages)
     return {"messages": [response]}

@@ -29,6 +29,7 @@ python agent.py
 
 啟動網頁介面 (Web UI)：
 ```bash
+# 啟動整合版介面 (Cerebras Llama / GPT-OSS)
 streamlit run app.py
 ```
 

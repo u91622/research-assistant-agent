@@ -7,3 +7,5 @@ openai
 langchain-openai
 streamlit
 watchdog
+langchain-cerebras
+
