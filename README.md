@@ -22,9 +22,14 @@
 
 ## 使用方法
 
-互動式執行代理人：
+互动式執行代理人 (CLI)：
 ```bash
 python agent.py
+```
+
+啟動網頁介面 (Web UI)：
+```bash
+streamlit run app.py
 ```
 
 ## 測試與基準測試

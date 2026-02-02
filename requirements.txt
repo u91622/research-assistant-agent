@@ -5,3 +5,5 @@ duckduckgo-search>=5.0
 pytest
 openai
 langchain-openai
+streamlit
+watchdog
