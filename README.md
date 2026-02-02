@@ -34,14 +34,26 @@ python agent.py
 pytest tests/test_agent.py
 ```
 
-### 基準測試範例
+### 基準測試範例 (Llama-3-8B 推論)
 
-| 指標 | 數值 | 描述 |
-|---|---|---|
-| **成功率** | 95% | 100 個樣本查詢的正確工具選擇準確率 |
-| **平均延遲** | 1.2s | 首個 token/完成 的平均時間 (使用模擬工具) |
-| **搜尋延遲**| ~2.5s | DuckDuckGo 搜尋工具執行的平均時間 |
-| **數學延遲** | <0.1s | 本地數學工具執行的平均時間 |
+以下為使用 `tests/test_performance.py` 進行的效能基準測試 (模擬數據)：
+
+| 框架 | 延遲 (Latency) | 吞吐量 (Throughput) | 備註 |
+|---|---|---|---|
+| **vLLM** | **~50ms** | **~150 tok/s** | 適合高並發，吞吐量高 |
+| **HuggingFace TGI** | ~80ms | ~80 tok/s | 適合長文本，整合性佳 |
+| **Agent 本地模擬** | < 1s | N/A | 本地單元測試基準 |
+
+> 若要在 Colab 上運行真實的 vLLM vs TGI 比較，請參考 `tests/test_performance.py` 中的說明。
+
+## CI/CD 自動化測試
+
+本專案已整合 GitHub Actions，每次 `push` 或 `pull_request` 到 `main` 分支時，會自動執行以下流程：
+1. **安裝依賴**：`pip install -r requirements.txt`
+2. **單元與整合測試**：`pytest tests/test_agent.py tests/test_tools.py`
+3. **效能基準測試**：`pytest tests/test_performance.py`
+
+詳細設定請見 `.github/workflows/ci.yml`。
 
 ## 目錄結構
 - `agent.py`: 主要代理人邏輯與進入點。
