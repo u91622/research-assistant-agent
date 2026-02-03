@@ -44,11 +44,20 @@ def train_tabular_model(dataset_source: str, target_column: str = "target") -> s
         str: 訓練結果摘要，包含準確率、最佳模型與特徵重要性。
     """
     try:
-        from automl_engine import AutoMLEngine
+        import importlib
+        import automl_v3_final
+        importlib.reload(automl_v3_final)
+        from automl_v3_final import AutoMLEngine
         # 為了 Demo 快速回應，設定預算為 10-30 秒
         engine = AutoMLEngine(time_budget=20) 
         
         result = {}
+        # Smart Shortcut for Titanic
+        if dataset_source.lower() == "titanic":
+            dataset_source = "titanic.csv"
+            if target_column == "target": # Only override if default
+                target_column = "Survived"
+                
         if dataset_source.startswith("openml:"):
             ds_id = int(dataset_source.split(":")[1])
             result = engine.train_from_openml(ds_id)
@@ -62,8 +71,13 @@ def train_tabular_model(dataset_source: str, target_column: str = "target") -> s
         summary = (
             f"✅ AutoML Training Complete!\n"
             f"- Best Estimator: {result['best_estimator']}\n"
-            f"- Test Accuracy: {result['test_accuracy']:.4f}\n"
+            f"- Accuracy: {result['test_accuracy']:.4f}\n"
+            f"- Precision: {result.get('precision', 0):.4f}\n"
+            f"- Recall: {result.get('recall', 0):.4f}\n"
+            f"- F1 Score: {result.get('f1_score', 0):.4f}\n"
+            f"- Confusion Matrix: {result.get('confusion_matrix')}\n"
             f"- Training Time: {result['training_duration']:.2f}s\n"
+            f"- 💾 Model Saved: {result.get('saved_model_path')} (Ready for Deployment)\n"
         )
         
         if result.get('feature_importance'):

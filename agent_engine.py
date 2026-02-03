@@ -6,9 +6,11 @@ from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.messages import HumanMessage, SystemMessage, BaseMessage
 from tools import tools # 從我們的 tools.py 匯入工具
 
+from langgraph.graph.message import add_messages
+
 # 定義狀態
 class AgentState(TypedDict):
-    messages: list[BaseMessage]
+    messages: Annotated[list[BaseMessage], add_messages]
 
 from langchain_core.runnables import RunnableConfig
 import os
@@ -22,13 +24,41 @@ def agent(state: AgentState, config: RunnableConfig):
     """
     messages = state['messages']
     
+    # 定義系統提示
+    system_prompt = SystemMessage(content="""You are a helpful AI Research Assistant.
+You have access to the following tools:
+1. multiply: Multiply two integers.
+2. add: Add two integers.
+3. search_duckduckgo: Search the web.
+4. train_tabular_model: AutoML tool to train machine learning models on tabular data.
+
+When asked to analyze data or train a model, use 'train_tabular_model'.
+For Titanic dataset, use 'openml:40945'. For Iris, use 'openml:61'.
+If the user mentions an uploaded file, look for it in the 'data/' directory (e.g., 'data/filename.csv').
+Always use the tools provided. Do not halllucinate answers for math or data training.""")
+    
+    # 安全地建構輸入訊息列表 (不要修改原始 state)
+    # 檢查第一則訊息是否已經是 SystemMessage
+    if messages and isinstance(messages[0], SystemMessage):
+        # 如果已經有了，我們用新的取代它 (建立新列表)
+        input_messages = [system_prompt] + messages[1:]
+    else:
+        # 如果沒有，插入在最前面
+        input_messages = [system_prompt] + messages
+    
     # 讀取配置
     configurable = config.get("configurable", {})
     provider = configurable.get("provider", "openai")
     model_name = configurable.get("model_name", "gpt-3.5-turbo")
     
+    # ... (Model init code)
+    
+    # 這裡省略模型初始化程式碼，因為上面 context 沒包含到，但我們只需要確保下面 invoke 用的是 input_messages
+
+    # (Re-stating the model init block to be safe in replacement if needed, 
+    # but since I am using replace_file_content with context, I will just focus on the logic block)
+    
     # 根據 provider 初始化模型
-    # 目前僅支援 Cerebras (使用 OpenAI 兼容協議)
     if provider == "cerebras":
         model = ChatOpenAI(
             model=model_name,
@@ -37,7 +67,6 @@ def agent(state: AgentState, config: RunnableConfig):
             api_key=os.environ.get("CEREBRAS_API_KEY")
         )
     else:
-        # Fallback to Cerebras just in case or raise error, but for now default to Cerebras Llama
         model = ChatOpenAI(
             model="llama-3.3-70b",
             temperature=0,
@@ -46,7 +75,7 @@ def agent(state: AgentState, config: RunnableConfig):
         )
 
     model = model.bind_tools(tools)
-    response = model.invoke(messages)
+    response = model.invoke(input_messages) # 使用 input_messages
     return {"messages": [response]}
 
 # 定義工具節點

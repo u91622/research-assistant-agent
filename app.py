@@ -6,13 +6,13 @@ import uuid
 # 將當前目錄加入 sys.path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from agent import app as agent_app
+from agent_engine import app as agent_app
 from langchain_core.messages import HumanMessage, AIMessage
 
 # 設定頁面資訊
 st.set_page_config(page_title="AI Research Assistant", page_icon="🤖", layout="centered")
-st.title("AI Research Assistant")
-st.caption("🚀 支援 Math, Search, 以及 **AutoML** (Beta)")
+st.title("AI Research Assistant (v2.1)")
+st.caption("🚀 支援 Math, Search, 以及 **Native AutoML** (Scikit-Learn) - Reloaded")
 
 # 側邊欄：模型選擇與設定
 with st.sidebar:
@@ -27,6 +27,12 @@ with st.sidebar:
         )
     )
     
+    # 側邊欄按鈕
+    if st.button("🗑️ 清除對話 (Reset)", help="若遇到 422 錯誤或卡住，請點此重置"):
+        st.session_state.thread_id = str(uuid.uuid4())
+        st.session_state.messages = []
+        st.rerun()
+
     # 2. 設定 Cerebras
     provider = "cerebras"
     if "Llama" in model_option:
@@ -37,6 +43,21 @@ with st.sidebar:
     api_key = st.text_input("Cerebras API Key", type="password")
     if api_key:
         os.environ["CEREBRAS_API_KEY"] = api_key
+
+    # 3. 檔案上傳區
+    st.markdown("---")
+    st.markdown("### 📂 Upload Dataset")
+    uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
+    if uploaded_file is not None:
+        # 確保 data 目錄存在
+        if not os.path.exists("data"):
+            os.makedirs("data")
+            
+        file_path = os.path.join("data", uploaded_file.name)
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.success(f"Saved: data/{uploaded_file.name}")
+        st.caption("Tell agent: 'Train on uploaded file'")
 
 # 初始化 Streamlit session state
 if "messages" not in st.session_state:
