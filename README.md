@@ -13,10 +13,10 @@ graph TD
     App -->|呼叫| Agent[LangGraph Agent]
     
     subgraph "Agent Workflow"
-        Agent -->|思考| Decide{是否需要工具?}
-        Decide -->|是| Tools[執行工具 (Search/Math)]
+        Agent -->|思考| Decide{"是否需要工具?"}
+        Decide -->|是| Tools["執行工具 (Search/Math)"]
         Tools -->|結果回傳| Agent
-        Decide -->|否| Response[生成回答]
+        Decide -->|否| Response["生成回答"]
     end
     
     Response -->|輸出| App
@@ -25,6 +25,7 @@ graph TD
 
 ## ✨ 主要功能
 - **極速推論**：整合 **Cerebras Llama-3.3-70B** 與 **GPT-OSS-120B**。
+- **AutoML 模組 (New)**：內建輕量化 AutoML 引擎 (基於 FLAML)，支援自動訓練表格資料模型。
 - **數學運算**：精確執行加法與乘法工具。
 - **網路搜尋**：整合 DuckDuckGo 搜尋即時資訊。
 - **對話記憶**：具備完整的對話上下文記憶功能。

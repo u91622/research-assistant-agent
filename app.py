@@ -12,6 +12,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 # 設定頁面資訊
 st.set_page_config(page_title="AI Research Assistant", page_icon="🤖", layout="centered")
 st.title("AI Research Assistant")
+st.caption("🚀 支援 Math, Search, 以及 **AutoML** (Beta)")
 
 # 側邊欄：模型選擇與設定
 with st.sidebar:
