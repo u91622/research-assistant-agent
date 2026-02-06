@@ -1,6 +1,6 @@
 # AI 研究助理 (Research Assistant Agent)
 
-這是一個使用 **LangChain** 和 **LangGraph** 構建的現代化 AI 研究助理。
+這是一個透過Antigravity IDE所進行之使用 **LangChain** 和 **LangGraph** 構建的現代化 AI 研究助理。
 專案核心採用 **Cerebras** 作為主要驅動力，並提供整合式 Web 介面。
 
 ## 專案架構
@@ -90,6 +90,7 @@ pytest --cov=./ tests/
 - `tools.py`: 自定義工具。
 - `benchmark_colab.ipynb`: Colab 效能測試筆記本。
 - `benchmark_visualization.py`: 產生測試圖表的輔助程式。
+
 
 
 
